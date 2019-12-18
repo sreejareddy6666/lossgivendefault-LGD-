@@ -1,0 +1,37 @@
+#import dataset
+Loss_Given_Default <-read.csv(file="C:/Users/Admin/Desktop/R/datasets/Loss Given Default.csv")
+data<-Loss_Given_Default
+
+
+#split data
+testindexes = sample(1:nrow(data), size=0.2*nrow(data))
+test = data[testindexes,]
+train = data[-testindexes,]
+#Train the data (fit model)
+library(e1071)
+svrmodel=svm(loss~.,data=train)
+par(mfrow=c(2,2))
+plot(svrmodel)
+summary(svrmodel)
+#Test the model
+svrpredicted=predict(svrmodel,test)
+
+#calculate RMSE
+library(Metrics)
+rmse(actual=test$loss,predicted=svrpredicted)
+
+#plot actual vs predicted
+df<-data.frame(actual=test$loss,predicted=svrpredicted)
+x<-1:dim(df)[1]; y1=df$actual; y2=df$predicted
+plot(x, y1, type="b", pch=19, col="blue", xlab="Index", ylab="Losses.in.Thousands",main="Actual Vs Predicted")
+# Add a line
+lines(x, y2, pch=18, col="red", type="b", lty=2)
+
+# Add a legend
+legend("bottomright", legend=c("Actual", "Predicted"),
+       col=c("blue", "red"), lty=1:2, cex=0.6)
+
+
+
+
+
